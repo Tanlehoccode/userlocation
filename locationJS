@@ -1,0 +1,22 @@
+// Kết nối với cơ sở dữ liệu
+var connection = new PgConnection();
+connection.connect("postgres", "postgres", "localhost", 5432, "leaflet");
+
+// Tạo một lớp điểm
+var layer = L.layerGroup();
+
+// Định nghĩa một sự kiện click
+layer.on("click", function(e) {
+  // Lấy tọa độ của điểm được nhấp
+  var coordinates = e.latlng.toJSON();
+
+  // Chèn tọa độ vào bảng PostGIS
+  connection.query("INSERT INTO points (type, coordinates) VALUES ('point', ST_Point(coordinates.lat, coordinates.lng));");
+});
+
+// Thêm lớp vào bản đồ
+var map = L.map("map", {
+  center: [10, 10],
+  zoom: 2
+});
+map.addLayer(layer);
